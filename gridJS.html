@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="./lib/gridjs.umd.js" type="text/javascript"></script>
+    <script src="./lib/l10n.umd.js" type="text/javascript"></script>
+    <script src="./lib/basicGridJS.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="./lib/mermaid.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="gridObj"></div>
+    <button onclick="testGrid.loaded()">로딩완료</button>
+    <div id="gridObj2"></div>
+    <button onclick="testGrid2.loaded()">로딩완료</button>
+</body>
+<script>
+    var sampleData = [
+        {
+            uniqueKey: "1",
+            region: "인천",
+            number: "032",
+            place: "송도",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "2",
+            region: "인천",
+            number: "032",
+            place: "부평",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "3",
+            region: "인천",
+            number: "032",
+            place: "강화",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "4",
+            region: "인천",
+            number: "032",
+            place: "연수",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "5",
+            region: "인천",
+            number: "032",
+            place: "중구",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "6",
+            region: "경기",
+            number: "031",
+            place: "광명",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "7",
+            region: "서울",
+            number: "02",
+            place: "중구",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "8",
+            region: "경기",
+            number: "031",
+            place: "김포",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "9",
+            region: "경기",
+            number: "031",
+            place: "광주",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "10",
+            region: "서울",
+            number: "02",
+            place: "명동",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "11",
+            region: "서울",
+            number: "02",
+            place: "동대문",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "12",
+            region: "인천",
+            number: "032",
+            place: "옹진",
+            other: "이것은 안보입니다."
+        },
+        {
+            uniqueKey: "13",
+            region: "경기",
+            number: "031",
+            place: "용문",
+            other: "이것은 안보입니다."
+        }
+    ]
+    var testGrid = {
+        highLightRowVal: {"중구" :"#f9fafb"}, //하이라이트 시킬 문자(셀 데이터가 "중구"이면 해당 행은 #f9fafb 색상으로 표기)
+        init: function(){
+            var customConfig = {
+                pagination: {
+                    limit: 7,
+                    resetPageOnUpdate: false 
+                }
+            }
+            this.superinit($("#gridObj")[0],customConfig);
+            this.setGridColumns([
+                {id: "uniqueKey", hidden:true, attributes:(cell,row)=>(testGrid.checkHighlightRow(cell,row))},
+                {id: "region", name: "지역", attributes:(cell,row)=>(testGrid.checkHighlightRow(cell,row))},
+                {id: "number", name: "전화지역번호", attributes:(cell,row)=>(testGrid.checkHighlightRow(cell,row))},
+                {id: "place", name: "장소", attributes:(cell,row)=>(testGrid.checkHighlightRow(cell,row))},
+                {id: "other", name: "기타", hidden:true, attributes:(cell,row)=>(testGrid.checkHighlightRow(cell,row))},
+            ])
+        },
+        getData: function(){
+            testGrid.loading();
+            //AJAX...
+
+            // Ajax ... Success
+                // testGrid.data = data;
+                // testGrid.loaded();
+
+            // 테스트데이터 삽입
+            testGrid.data = sampleData;
+
+            testGrid.setGridLoadData();
+            testGrid.draw(); //테이블 그리기
+        }
+    }
+    var testGrid2 = {
+        highLightRowVal: {"%SELECTED$": "#74DF00", "중구" :"#F9FAFB"}, //가장 첫번째 있는것이 우선순위
+        currentSelectedTarget : null, //선택된 행을 가지고있는다.
+        init: function(){
+            var customConfig = {
+                pagination: {
+                    limit: 7,
+                    resetPageOnUpdate: false 
+                }
+            }
+            this.superinit($("#gridObj2")[0],customConfig);
+            this.setGridColumns([
+                // 하이라이트row를 사용하려면 모든 컬럼 attributes 옵션에 checkHighlightRow가 필요함. hidden은 필요없음
+                {id: "uniqueKey", hidden:true, attributes:(cell,row)=>(testGrid2.checkHighlightRow(cell,row))},
+                {id: "region", name: "지역", attributes:(cell,row)=>(testGrid2.checkHighlightRow(cell,row))},
+                {id: "number", name: "전화지역번호", attributes:(cell,row)=>(testGrid2.checkHighlightRow(cell,row))},
+                {id: "place", name: "장소", attributes:(cell,row)=>(testGrid2.checkHighlightRow(cell,row))},
+                {id: "other", name: "기타", hidden:true, attributes:(cell,row)=>(testGrid2.checkHighlightRow(cell,row))},
+                {id: "SELECTED", hidden:true, attributes:(cell,row)=>(testGrid2.checkHighlightRow(cell,row))},
+                {name: "선택하기", attributes:(cell,row)=>(testGrid2.checkHighlightRow(cell,row)), formatter: (cell,row)=>{
+                    return gridjs.h('button',{
+                        className: "btn", //버튼에 지정할 클래스이름을 선택, 2개이상의 클래스 적용시에는 className: "class1 class2 ..."
+                        onClick: () => { //버튼클릭시 수행할 내용
+                            // 셀 선택 하이라이트
+                            if(testGrid2.currentSelectedTarget!=null){
+                                testGrid2.currentSelectedTarget["SELECTED"] = null;
+                            }
+                            testGrid2.currentSelectedTarget = testGrid2.data.find(item => item.uniqueKey === row.cells[0].data);
+                            testGrid2.currentSelectedTarget["SELECTED"] = "%SELECTED$";
+                            testGrid2.draw();
+                            // row <- 선택된 행
+                            // cells[N].data <- 선택된 행 중 N번째 셀 
+
+                            // TODO: 여기에 추가로 버튼을 눌렀을 경우 이행될 명령어 작성
+                        }
+                    },'선택') //버튼에 보여주는 문자
+                }}
+            ])
+        },
+        getData: function(){
+            testGrid2.loading();
+            //AJAX...
+
+            // Ajax ... Success
+                // testGrid2.data = testGrid2.makeSelection(data, "SELECTED")
+                // testGrid2.loaded(); 
+            
+            // 테스트데이터삽입
+            testGrid2.data = testGrid2.makeSelection(sampleData, "SELECTED") //선택컬럼을 만들어준다. 이제 baseData는 testGrid2.data이다.
+
+            testGrid2.setGridLoadData(); //testGird2.data를 로드한다.
+            testGrid2.draw();
+        }
+    }
+    
+    //basicGridJS를 testGrid에 덮어쓴다.
+    $.extend(true,testGrid,basicGridJS); //반드시 필요
+    $.extend(true,testGrid2,basicGridJS); //반드시 필요
+
+    testGrid.init();
+    testGrid.getData();
+
+    testGrid2.init();
+    testGrid2.getData();
+    
+    // 행클릭시 이벤트처리
+    testGrid.grid.on('rowClick', (...args) => {console.log('row: ' + JSON.stringify(args), args);
+        alert('row: ' + JSON.stringify(args));
+    });
+
+</script>
+</html>
